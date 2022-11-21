@@ -6,8 +6,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#215074"/>
-    <title>Bogdan Trohanel</title>
+    <title>Deploy steps -- Django Nginx Gunicorn</title>
     <base href="/">
     <!-- links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -18,29 +17,159 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Alata&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Arima+Madurai&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Sniglet&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Alata&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static '/scss/global/global.css' %}" type="text/css">
-
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="static/images/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="static/images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="static/images/favicon/favicon-16x16.png">
-    <link rel="manifest" href="static/images/favicon/site.webmanifest">    
-    <link rel="shortcut icon" href="static/images/favicon/favicon.ico">
+    <link rel="stylesheet" href="{% static 'scss/base.css' %}">
 
     
-    <script rel="stylesheet" src="{% static '/js/base.js' %}" type="text/javascript"></script>
-    <script rel="stylesheet" src="{% static '/js/home.js' %}" type="text/javascript"></script>
-
 </head>
 <body ontouchstart="" >
-    {% include 'core/nav.html' %}
-    <div class="width">
-    {% block content %}
-    {% endblock %}
+  <div class="steps">
+    <div class="step">
+
+
+      cd /webapps/bogdan
+      <hr>
+      git clone GIT_REPO_URL
+      <hr>
+      sudo chown bogdan:webapps .
+      <hr>
+      cd GIT_REPO
+      <hr>
+      <span>
+        If needed:
+        <br>
+        cd ..
+        <br>
+        pip install -r GIT_REPO/req.txt
+      </span>
+      <hr>
+      python3 manage.py runserver 188.166.110.10:8001
+      <br>
+      <br>
+      <span>
+        Check for errors and fix them
+      </span>
+      <hr>
+      cd /etc/systemd/system
+      <hr>
+      sudo nano GIT_REPO.socket
+      <hr>
+      <pre>
+        [Unit]
+        Description=GIT_REPO socket
+
+        [Socket]
+        ListenStream=/run/GIT_REPO.sock
+        
+        [Install]
+        WantedBy=sockets.target
+      </pre>
+      <hr>
+      sudo nano GIT_REPO.service
+      <hr>
+      <pre>
+        [Unit]
+        Description=gunicorn daemon
+        After=network.target
+
+        [Service]
+        User=bogdan
+        Group=webapps
+        WorkingDirectory=/webapps/bogdan/GIT_REPO
+        ExecStart=/webapps/bogdan/env/bin/gunicorn \
+                --access-logfile - \
+                --workers 3 \
+                --bind unix:/run/GIT_REPO.sock \
+                demo.wsgi:application
+
+        [Install]
+        WantedBy=multi-user.target
+      </pre>
+      <hr>
+      sudo systemctl start GIT_REPO.socket
+      <br>
+      <br>
+      sudo systemctl start GIT_REPO.service
+      <hr>
+      sudo systemctl enable GIT_REPO.socket
+      <br>
+      <br>
+      sudo systemctl enable GIT_REPO.service
+      <hr>
+      sudo systemctl status GIT_REPO <span style="margin-left: 20px;">// Gunicorn service </span>
+      <br>
+      <br>
+      sudo systemctl status GIT_REPO.socket
+      <hr>
+      sudo systemctl daemon-reload
+      <br>
+      <br>
+      sudo systemctl restart GIT_REPO <span style="margin-left: 20px;">// Gunicorn service </span>
+      <hr>
+      cd /etc/nginx/sites-available
+      <br>
+      <br>
+      sudo nano GIT_REPO
+      <hr>
+      <pre>
+        server {
+          server_name domain.com www.domain.com;
+      
+          location = /favicon.ico { access_log off; log_not_found off; }
+      
+          location / {
+              include proxy_params;
+              proxy_pass http://unix:/run/GIT_REPO.sock;
+          }
+      
+          location  /static/ {
+              root /webapps/bogdan/GIT_REPO/static;
+          }
+      
+          location  /media/ {
+              root /webapps/bogdan/GIT_REPO/static;
+          }
+      }
+      </pre>
+      <hr>
+      sudo ln -s /etc/nginx/sites-available/GIT_REPO /etc/nginx/sites-enabled
+      <hr>
+      <span>Check for errors:</span>
+      <br>
+      <br>
+      sudo nginx -t
+      <br>
+      <br>
+      <span>Fix errors, then run</span>
+      <br>
+      <br>
+      sudo systemctl restart nginx
+      <hr>
+      sudo systemctl status nginx
+      <hr>
+      <span>If errors, fix them before continue, then run</span>
+      <br>
+      <br>
+      sudo nginx -s reload
+      <hr>
+      <span>Check that sites-available has the nginx file</span>
+      <br>
+      <br>
+      cd /etc/nginx/sites-enabled
+      <hr>
+      <span>Make sure domain is 100% correct</span>
+      <br>
+      <li>DNS</li>
+      <li>Nginx file - make sure domain is correct</li>
+      <hr>
+      sudo certbot --nginx -d domain.com -d www.domain.com
+      <hr>
+      sudo certbot renew --dry-run
+      <br>
+      <br>
+      <br>
+      <br>
     </div>
+  </div>
 </body>
 </html>
