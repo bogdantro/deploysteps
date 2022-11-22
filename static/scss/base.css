@@ -26,6 +26,9 @@
 .steps .step span {
   background: rgba(120, 120, 120, 0.05);
 }
+.steps .step h1 {
+  font-size: 30px;
+}
 .steps .step:first-child {
   margin-top: 0;
 }/*# sourceMappingURL=base.css.map */

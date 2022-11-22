@@ -26,7 +26,58 @@
   <div class="steps">
     <div class="step">
 
+      
+      <h1>PostgreSQL setup</h1>
+      <hr>
+      <span>Log into an interactive Postgres session by typing:</span>
+      <br>
+      <br>
+      sudo -u postgres psql
+      <hr>
+      CREATE DATABASE myproject;
+      <hr>
+      CREATE USER myprojectuser WITH PASSWORD 'password';
+      <hr>
+      ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
+      ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
+      ALTER ROLE myprojectuser SET timezone TO 'UTC';
+      <hr>
+      GRANT ALL PRIVILEGES ON DATABASE myproject TO myprojectuser;
+      <hr>
+      \q
+      <hr>
+      <span>Go into settings.py, and paste in this</span>
+      <br>
+      <br>
+      <pre>
+DATABASES = {
+  'default': {
+      'ENGINE': 'django.db.backends.postgresql',
+      'NAME': 'myproject',
+      'USER': 'myprojectuser',
+      'PASSWORD': 'password',
+      'HOST': 'localhost',
+      'PORT': '',
+  }
+}
+      </pre>
+      <hr>
+      cd /webapps/bogdan/GIT_REPO
+      python manage.py makemigrations
+      python manage.py migrate
+      <hr>
+      sudo ufw allow 8000
+      <hr>
+      <span>Test if it worked</span>
+      python3 manage.py runserver 188.166.110.10:8001
+      <hr>
+      
+      <br>
+      <br>
+      <br>
 
+      <h1>Setup Django, Nginx and Gunicorn</h1>
+      <hr>
       cd /webapps/bogdan
       <hr>
       git clone GIT_REPO_URL
