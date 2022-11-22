@@ -184,17 +184,17 @@ server {
 
   location = /favicon.ico { access_log off; log_not_found off; }
 
+  location /static/ {
+    alias /webapps/bogdan/GIT_REPO/static/;
+  }
+  
+  location /media/ {
+    alias /webapps/bogdan/GIT_REPO/media/;
+  } 
+  
   location / {
       include proxy_params;
       proxy_pass http://unix:/run/GIT_REPO.sock;
-  }
-
-  location  /static/ {
-      alias /webapps/bogdan/GIT_REPO/static;
-  }
-
-  location  /media/ {
-      alias /webapps/bogdan/GIT_REPO/media;
   }
 }
     </pre>
