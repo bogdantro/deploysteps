@@ -46,7 +46,7 @@
       <hr>
       \q
       <hr>
-      <span>Go into settings.py, and paste in this</span>
+      <span>Go into settings.py, and paste this</span>
       <br>
       <br>
       <pre>
@@ -63,16 +63,29 @@ DATABASES = {
       </pre>
       <hr>
       cd /webapps/bogdan/GIT_REPO
+      <br>
+      <br>
       python manage.py makemigrations
+      <br>
+      <br>
       python manage.py migrate
       <hr>
       sudo ufw allow 8000
       <hr>
       <span>Test if it worked</span>
+      <br>
+      <br>
       python3 manage.py runserver 188.166.110.10:8001
       <hr>
-      
+      sudo systemctl daemon-reload
       <br>
+      <br>
+      sudo systemctl restart GIT_REPO
+      <br>
+      <br>
+      sudo systemctl restart nginx
+      <hr>
+
       <br>
       <br>
 
