@@ -31,7 +31,7 @@
       <hr>
       git clone GIT_REPO_URL
       <hr>
-      sudo chown bogdan:webapps .
+      sudo chown -R bogdan:webapps .
       <hr>
       cd GIT_REPO
       <hr>
@@ -55,35 +55,35 @@
       sudo nano GIT_REPO.socket
       <hr>
       <pre>
-        [Unit]
-        Description=GIT_REPO socket
+[Unit]
+Description=GIT_REPO socket
 
-        [Socket]
-        ListenStream=/run/GIT_REPO.sock
-        
-        [Install]
-        WantedBy=sockets.target
+[Socket]
+ListenStream=/run/GIT_REPO.sock
+
+[Install]
+WantedBy=sockets.target
       </pre>
       <hr>
       sudo nano GIT_REPO.service
       <hr>
       <pre>
-        [Unit]
-        Description=gunicorn daemon
-        After=network.target
+[Unit]
+Description=gunicorn daemon
+After=network.target
 
-        [Service]
-        User=bogdan
-        Group=webapps
-        WorkingDirectory=/webapps/bogdan/GIT_REPO
-        ExecStart=/webapps/bogdan/env/bin/gunicorn \
-                --access-logfile - \
-                --workers 3 \
-                --bind unix:/run/GIT_REPO.sock \
-                demo.wsgi:application
+[Service]
+User=bogdan
+Group=webapps
+WorkingDirectory=/webapps/bogdan/GIT_REPO
+ExecStart=/webapps/bogdan/env/bin/gunicorn \
+        --access-logfile - \
+        --workers 3 \
+        --bind unix:/run/GIT_REPO.sock \
+        demo.wsgi:application
 
-        [Install]
-        WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
       </pre>
       <hr>
       sudo systemctl start GIT_REPO.socket
@@ -115,25 +115,25 @@
       sudo nano GIT_REPO
       <hr>
       <pre>
-        server {
-          server_name domain.com www.domain.com;
-      
-          location = /favicon.ico { access_log off; log_not_found off; }
-      
-          location / {
-              include proxy_params;
-              proxy_pass http://unix:/run/GIT_REPO.sock;
-          }
-      
-          location  /static/ {
-              root /webapps/bogdan/GIT_REPO/static;
-          }
-      
-          location  /media/ {
-              root /webapps/bogdan/GIT_REPO/media;
-          }
-      }
-      </pre>
+server {
+  server_name domain.com www.domain.com;
+
+  location = /favicon.ico { access_log off; log_not_found off; }
+
+  location / {
+      include proxy_params;
+      proxy_pass http://unix:/run/GIT_REPO.sock;
+  }
+
+  location  /static/ {
+      alias /webapps/bogdan/GIT_REPO/static;
+  }
+
+  location  /media/ {
+      alias /webapps/bogdan/GIT_REPO/media;
+  }
+}
+    </pre>
       <hr>
       sudo ln -s /etc/nginx/sites-available/GIT_REPO /etc/nginx/sites-enabled
       <hr>

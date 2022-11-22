@@ -3,6 +3,7 @@
   margin: 0;
   padding: 0;
   font-family: "Alata", sans-serif;
+  font-size: 16px;
 }
 
 .steps {
@@ -11,7 +12,7 @@
   height: auto;
   padding: 10px;
   margin: auto;
-  transform: translateY(150px);
+  transform: translateY(90px);
 }
 .steps .step {
   width: 95%;
@@ -24,12 +25,6 @@
 }
 .steps .step span {
   background: rgba(120, 120, 120, 0.05);
-}
-.steps .step pre {
-  margin-left: 0;
-  padding-left: 0;
-  text-align: left;
-  overflow: hidden;
 }
 .steps .step:first-child {
   margin-top: 0;
