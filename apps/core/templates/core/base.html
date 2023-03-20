@@ -196,7 +196,7 @@ After=network.target
 User=bogdan
 Group=webapps
 WorkingDirectory=/webapps/bogdan/GIT_REPO
-ExecStart=/webapps/bogdan/env/bin/gunicorn \
+ExecStart=/usr/bin/gunicorn \
         --access-logfile - \
         --workers 3 \
         --bind unix:/run/GIT_REPO.sock \
